@@ -1,0 +1,417 @@
+import os
+import random
+import threading
+import time
+from random import randint
+from threading import Thread
+
+from backend.descriptions import SCENARIO_DESCRIPTIONS
+
+
+def run_basic_thread(scenario_id: int):
+    output_log = []
+    description = ""
+
+    if scenario_id == 1:
+        description = SCENARIO_DESCRIPTIONS["thread"]["defining_thread"].get(
+            scenario_id, "سناریو یافت نشد"
+        )
+
+        def send_email(user):
+            output_log.append(f"شروع ارسال ایمیل به {user}...")
+            time.sleep(random.uniform(0.5, 2.5))
+            output_log.append(f"ایمیل با موفقیت به {user} ارسال شد.")
+
+        users = ["Ali", "Sara", "Reza"]
+        threads = [threading.Thread(target=send_email, args=(u,)) for u in users]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 2:
+        description = SCENARIO_DESCRIPTIONS["thread"]["defining_thread"][2]
+
+        def download_chunk(chunk_id):
+            output_log.append(f"در حال دانلود قطعه {chunk_id}...")
+            time.sleep(random.uniform(0.5, 2.5))
+            output_log.append(f"دانلود قطعه {chunk_id} تکمیل شد.")
+
+        threads = [
+            threading.Thread(target=download_chunk, args=(i,)) for i in range(1, 4)
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        description = SCENARIO_DESCRIPTIONS["thread"]["defining_thread"][3]
+
+        def read_sensor(sensor_name):
+            output_log.append(f"اتصال به سنسور {sensor_name}...")
+            time.sleep(random.uniform(0.5, 2.5))
+            output_log.append(f"داده از سنسور {sensor_name} دریافت شد.")
+
+        sensors = ["دما", "رطوبت", "فشار"]
+        threads = [threading.Thread(target=read_sensor, args=(s,)) for s in sensors]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+    else:
+        description = "شماره سناریو نامعتبر است."
+
+    return {"output": output_log, "description": description}
+
+
+def run_determining_current_thread(scenario_id: int):
+    description = SCENARIO_DESCRIPTIONS["thread"]["determining_the_current_thread"][
+        scenario_id
+    ]
+    logs = []
+
+    if scenario_id == 1:
+        logs.append("شروع سناریو ۱: سرویس‌های پس‌زمینه سیستم...\n")
+
+        def service_task():
+            thread_name = threading.current_thread().name
+            logs.append(f"[{thread_name}] --> شروع به کار کرد.\n")
+            time.sleep(random.uniform(1.0, 2.0))
+            logs.append(f"[{thread_name}] --> عملیاتش تمام شد و خارج شد.\n")
+
+        t1 = threading.Thread(name="LoggerService", target=service_task)
+        t2 = threading.Thread(name="MonitorService", target=service_task)
+        t3 = threading.Thread(name="BackupService", target=service_task)
+
+        threads = [t1, t2, t3]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        logs.append("\n✅ تمامی سرویس‌ها با موفقیت کار خود را به پایان رساندند.")
+
+        return {"description": description, "output": logs}
+
+    elif scenario_id == 2:
+        logs.append("شروع سناریو ۲: کارگران خط تولید دیتا...\n")
+
+        def worker_pipeline():
+            current_name = threading.current_thread().name
+            logs.append(f"کارگر [{current_name}] وارد خط تولید شد.\n")
+
+            if current_name == "DataFetcher":
+                logs.append(f"[{current_name}]: در حال استخراج داده‌ها از API...\n")
+                time.sleep(1)
+            elif current_name == "DataProcessor":
+                logs.append(f"[{current_name}]: در حال پردازش و پاکسازی داده‌ها...\n")
+                time.sleep(1.5)
+            elif current_name == "DataSaver":
+                logs.append(f"[{current_name}]: در حال ذخیره داده‌ها در دیتابیس...\n")
+                time.sleep(0.5)
+
+            logs.append(f"کارگر [{current_name}] کارش را تمام کرد.\n")
+
+        t1 = threading.Thread(name="DataFetcher", target=worker_pipeline)
+        t2 = threading.Thread(name="DataProcessor", target=worker_pipeline)
+        t3 = threading.Thread(name="DataSaver", target=worker_pipeline)
+
+        threads = [t1, t2, t3]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        return {"description": description, "output": logs}
+
+    elif scenario_id == 3:
+        logs.append("شروع سناریو ۳: تفکیک نخ اصلی از فرعی...\n")
+
+        current_thread_name = threading.current_thread().name
+        logs.append(f"👑 نام نخ اجرا کننده این خط: {current_thread_name}\n")
+
+        def background_task():
+            current = threading.current_thread()
+            logs.append(f"👻 نام نخ پس‌زمینه: {current.name}\n")
+            logs.append(
+                f"آیا این نخ همان نخ اصلی است؟ {'بله' if current.name == 'MainThread' else 'خیر'}\n"
+            )
+            time.sleep(1.5)
+            logs.append(f"👻 کار نخ پس‌زمینه ({current.name}) تمام شد.\n")
+
+        bg_thread = threading.Thread(name="BackgroundWorker-1", target=background_task)
+        bg_thread.start()
+
+        active_threads = threading.enumerate()
+        logs.append(
+            f"\n📊 لیست تمام نخ‌های فعال در این لحظه ({len(active_threads)} مورد):\n"
+        )
+        for th in active_threads:
+            logs.append(f" - {th.name}\n")
+
+        bg_thread.join()
+
+        return {"description": description, "output": logs}
+
+
+def run_thread_subclass(scenario_id: int):
+    logs = []
+    description = SCENARIO_DESCRIPTIONS["thread"]["thread_subclass"].get(
+        scenario_id, "سناریوی نامعتبر یافت نشد."
+    )
+
+    if scenario_id == 1:
+
+        class MyThreadClass(Thread):
+            def __init__(self, name, duration):
+                Thread.__init__(self)
+                self.name = name
+                self.duration = duration
+
+            def run(self):
+                logs.append(
+                    f"---> {self.name} در حال اجرا متعلق به واحد اجرایی با شناسه {os.getpid()}\n"
+                )
+                time.sleep(self.duration)
+                logs.append(f"---> {self.name} (خوابیده {self.duration}s)\n")
+
+        start_time = time.time()
+        threads = []
+
+        for i in range(1, 10):
+            t = MyThreadClass(f"نخ#{i}", randint(1, 3))
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        logs.append("پایان")
+        logs.append("--- %.4f ثانیه ---\n" % (time.time() - start_time))
+
+    elif scenario_id == 2:
+
+        class CalculatorThread(Thread):
+            def __init__(self, number):
+                super().__init__()
+                self.number = number
+                self.result = None
+
+            def run(self):
+                logs.append(
+                    f"[محاسبات] نخ داره محاسبه میکنه توان دوم {self.number}...\n"
+                )
+                time.sleep(0.5)
+                self.result = self.number**2
+
+        threads = []
+        numbers_to_calc = [4, 7, 12]
+
+        for num in numbers_to_calc:
+            t = CalculatorThread(num)
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+            logs.append(f"[نتیجه] توان دوم {t.number} هست {t.result}\n")
+
+    elif scenario_id == 3:
+
+        class WorkerThread(Thread):
+            def __init__(self, name, shared_list):
+                super().__init__()
+                self.name = name
+                self.shared_list = shared_list
+
+            def run(self):
+                logs.append(f"[{self.name}] اضافه کردن داده ها به لیست اشتراکی.\n")
+                time.sleep(0.2)
+                self.shared_list.append(f"داده از {self.name}")
+
+        shared_results = []
+        threads = []
+
+        for i in range(1, 4):
+            t = WorkerThread(f"کارگر-{i}", shared_results)
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        logs.append("\کار کارگر ها تمام شد. محتویات لیست اشتراکی نهایی:\n")
+        for item in shared_results:
+            logs.append(f" - {item}\n")
+
+    return {"description": description, "output": logs}
+
+
+def run_lock_thread(scenario_id: int):
+    output_log = []
+    description = ""
+    lock = threading.Lock()
+
+    if scenario_id == 1:
+        description = SCENARIO_DESCRIPTIONS["thread"]["lock"][1]
+        tickets = 1
+
+        def book_ticket(user_id):
+            nonlocal tickets
+            output_log.append(f"کاربر {user_id} در حال بررسی ظرفیت بلیت...")
+            with lock:
+                if tickets > 0:
+                    time.sleep(0.1)
+                    tickets -= 1
+                    output_log.append(
+                        f"✅ بلیت با موفقیت برای کاربر {user_id} رزرو شد."
+                    )
+                else:
+                    output_log.append(f"❌ کاربر {user_id} موفق نشد. ظرفیت تکمیل است.")
+
+        threads = [threading.Thread(target=book_ticket, args=(i,)) for i in range(1, 4)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 2:
+        description = SCENARIO_DESCRIPTIONS["thread"]["lock"][2]
+        balance = 1000
+        output_log.append(f"موجودی اولیه: {balance} تومان")
+
+        def transaction(amount, t_type):
+            nonlocal balance
+            with lock:
+                temp = balance
+                time.sleep(0.05)
+                if t_type == "deposit":
+                    balance = temp + amount
+                    output_log.append(
+                        f"💰 واریز {amount} تومان. موجودی جدید: {balance}"
+                    )
+                elif t_type == "withdraw":
+                    if temp >= amount:
+                        balance = temp - amount
+                        output_log.append(
+                            f"💸 برداشت {amount} تومان. موجودی جدید: {balance}"
+                        )
+                    else:
+                        output_log.append(
+                            f"❌ موجودی کافی نیست برای برداشت {amount} تومان."
+                        )
+
+        threads = [
+            threading.Thread(target=transaction, args=(500, "deposit")),
+            threading.Thread(target=transaction, args=(200, "withdraw")),
+            threading.Thread(target=transaction, args=(800, "withdraw")),
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        description = SCENARIO_DESCRIPTIONS["thread"]["lock"][3]
+        views = 0
+
+        def add_view():
+            nonlocal views
+            with lock:
+                temp = views
+                time.sleep(0.01)
+                views = temp + 1
+
+        threads = [threading.Thread(target=add_view) for _ in range(50)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        output_log.append(
+            f"تعداد بازدید ثبت شده با موفقیت: {views} (از 50 درخواست همزمان)"
+        )
+
+    else:
+        description = "شماره سناریو نامعتبر است."
+
+    return {"output": output_log, "description": description}
+
+
+def run_semaphore_thread(scenario_id: int):
+    output_log = []
+    description = ""
+
+    if scenario_id == 1:
+        description = SCENARIO_DESCRIPTIONS["thread"]["semaphore"][1]
+        spots = 3
+        semaphore = threading.Semaphore(spots)
+
+        def car_enter_parking(car_id):
+            output_log.append(f"🚗 ماشین {car_id} منتظر ورود به پارکینگ است...")
+            semaphore.acquire()
+            output_log.append(f"✅ ماشین {car_id} وارد پارکینگ شد.")
+            time.sleep(0.2)  # The waiting time in parking
+            output_log.append(f"⬅️ ماشین {car_id} از پارکینگ خارج شد.")
+            semaphore.release()
+
+        threads = [
+            threading.Thread(target=car_enter_parking, args=(i,)) for i in range(1, 6)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 2:
+        description = SCENARIO_DESCRIPTIONS["thread"]["semaphore"][2]
+        max_connections = 2
+        semaphore = threading.Semaphore(max_connections)
+
+        def run_db_query(query_id):
+            output_log.append(f"درخواست {query_id} منتظر اتصال به دیتابیس است...")
+            with semaphore:
+                output_log.append(
+                    f"🔗 اتصال برقرار شد. در حال اجرای کوئری {query_id}..."
+                )
+                time.sleep(0.3)
+                output_log.append(
+                    f"✅ کوئری {query_id} با موفقیت اجرا شد و اتصال آزاد شد."
+                )
+
+        threads = [
+            threading.Thread(target=run_db_query, args=(i,)) for i in range(1, 5)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        description = SCENARIO_DESCRIPTIONS["thread"]["semaphore"][3]
+        max_downloads = 2
+        semaphore = threading.Semaphore(max_downloads)
+
+        def download_file(file_name):
+            output_log.append(f"فایل '{file_name}' در صف دانلود قرار گرفت.")
+            with semaphore:
+                output_log.append(f"📥 شروع دانلود '{file_name}'...")
+                time.sleep(0.2)
+                output_log.append(f"✅ دانلود '{file_name}' تمام شد.")
+
+        files = ["ویدیو.mp4", "عکس.jpg", "موزیک.mp3", "سند.pdf", "آرشیو.zip"]
+        threads = [threading.Thread(target=download_file, args=(f,)) for f in files]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    else:
+        description = "شماره سناریو نامعتبر است."
+
+    return {"output": output_log, "description": description}

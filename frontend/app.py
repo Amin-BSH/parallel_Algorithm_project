@@ -1,0 +1,108 @@
+import streamlit as st
+import requests
+import base64
+from pathlib import Path
+
+
+def load_font():
+    font_path = Path(__file__).parent / "fonts" / "Vazir-Thin.ttf"
+
+    with open(font_path, "rb") as f:
+        font_data = f.read()
+
+    font_base64 = base64.b64encode(font_data).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        @font-face {{
+            font-family: 'Vazir';
+            src: url(data:font/ttf;base64,{font_base64}) format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }}
+
+        html, body, * {{
+            font-family: 'Vazir', sans-serif !important;
+            direction: rtl;
+            text-align: right;
+        }}
+
+        /* keep code blocks LTR */
+        pre, code {{
+            direction: ltr;
+            text-align: left;
+        }}
+
+        /* fix inputs & labels */
+        label {{
+            direction: rtl;
+            text-align: right;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+load_font()
+
+# تنظیمات صفحه
+st.set_page_config(
+    page_title="Parallel Processing Project", page_icon="🚀", layout="centered"
+)
+
+st.title("🚀 پروژه نهایی: پردازش موازی در پایتون")
+st.markdown("---")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    method_display = st.selectbox("⚙️ روش همزمانی:", ["نخ (Thread)", "فرآیند (Process)"])
+    method_map = {"نخ (Thread)": "thread", "فرآیند (Process)": "process"}
+
+with col2:
+    tool_display = (
+        st.selectbox(
+            "🛠️ ابزار همزمانی:",
+            ["نخ پایه", "مشخص کردن نخ فعلی", "زیر کلاس", "لاک", "سمافور"],
+        )
+        if method_display == "نخ (Thread)"
+        else st.selectbox("test", ["process"])
+    )
+    tool_map = {
+        "نخ پایه": "basic_thread",
+        "لاک": "lock",
+        "سمافور": "semaphore",
+        "مشخص کردن نخ فعلی": "determining_current_thread",
+        "زیر کلاس": "subclass",
+    }
+
+with col3:
+    scenario_id = st.selectbox("📝 شماره سناریو:", [1, 2, 3])
+
+if st.button("▶️ اجرای سناریو", type="primary"):
+    with st.spinner("⏳ در حال پردازش و ارتباط با سرور..."):
+        payload = {
+            "method": method_map[method_display],
+            "tool": tool_map[tool_display],
+            "scenario_id": scenario_id,
+        }
+
+        try:
+            response = requests.post("http://localhost:8000/run-scenario", json=payload)
+
+            if response.status_code == 200:
+                data = response.json()
+
+                st.info(data.get("description", "توضیحاتی یافت نشد."))
+                st.subheader("🖥️ خروجی اجرا:")
+                with st.container():
+                    for log in data.get("output", []):
+                        st.code(log, language="text")
+            else:
+                st.error(f"❌ خطایی در سرور رخ داد: {response.text}")
+
+        except requests.exceptions.ConnectionError:
+            st.error(
+                "🔌 خطا: ارتباط با سرور بک‌اند (FastAPI) برقرار نشد. مطمئن شوید که سرور روشن است."
+            )
