@@ -342,6 +342,130 @@ def run_lock_thread(scenario_id: int):
     return {"output": output_log, "description": description}
 
 
+def run_rlock_thread(scenario_id: int):
+    logs = []
+    desc = (
+        SCENARIO_DESCRIPTIONS.get("thread", {})
+        .get("rlock", {})
+        .get(scenario_id, "Description not found.")
+    )
+    if scenario_id == 1:
+        rlock = threading.RLock()
+        shared_inventory = {"items": 0}
+
+        class InventoryManager:
+            def log_addition(self, thread_name, count):
+                with rlock:
+                    logs.append(
+                        f"[{thread_name}] قفل RLock در log_addition() دریافت شد."
+                    )
+                    time.sleep(random.uniform(0.1, 0.3))
+                    logs.append(f"[{thread_name}] ثبت شد: {count} آیتم اضافه گردید.")
+
+            def add_items(self, thread_name, count):
+                with rlock:
+                    logs.append(
+                        f"[{thread_name}] قفل RLock در add_items() دریافت شد. در حال شروع افزودن..."
+                    )
+                    shared_inventory["items"] += count
+                    self.log_addition(thread_name, count)
+                    logs.append(
+                        f"[{thread_name}] افزودن آیتم‌ها پایان یافت. مجموع اکنون {shared_inventory['items']} است."
+                    )
+
+        manager = InventoryManager()
+
+        def worker(name, items_to_add):
+            logs.append(f"[{name}] در حال تلاش برای افزودن {items_to_add} آیتم...")
+            manager.add_items(name, items_to_add)
+
+        threads = [
+            threading.Thread(target=worker, args=(f"Thread-{i}", random.randint(1, 5)))
+            for i in range(3)
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        logs.append(f"[نخ اصلی] موجودی نهایی انبار: {shared_inventory['items']} آیتم.")
+
+    elif scenario_id == 2:
+        rlock = threading.RLock()
+
+        def recursive_factorial(n, thread_name):
+            with rlock:
+                logs.append(f"[{thread_name}] قفل برای n={n} دریافت شد.")
+                time.sleep(0.1)
+                if n == 0 or n == 1:
+                    logs.append(
+                        f"[{thread_name}] رسیدن به شرط پایه (n={n}). در حال آزادسازی قفل..."
+                    )
+                    return 1
+                else:
+                    result = n * recursive_factorial(n - 1, thread_name)
+                    logs.append(
+                        f"[{thread_name}] محاسبه فاکتوریل برای n={n} انجام شد. در حال آزادسازی..."
+                    )
+                    return result
+
+        def worker(num):
+            thread_name = threading.current_thread().name
+            logs.append(f"[{thread_name}] شروع محاسبه بازگشتی فاکتوریل برای {num}")
+            res = recursive_factorial(num, thread_name)
+            logs.append(f"[{thread_name}] نتیجه نهایی برای {num}! = {res}")
+
+        threads = [
+            threading.Thread(target=worker, args=(3,), name="FactThread-1"),
+            threading.Thread(target=worker, args=(4,), name="FactThread-2"),
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        rlock = threading.RLock()
+
+        def backup_db(thread_name):
+            with rlock:
+                logs.append(f"[{thread_name}] قفل RLock برای بک‌آپ دیتابیس دریافت شد.")
+                time.sleep(0.2)
+                logs.append(f"[{thread_name}] بک‌آپ دیتابیس تکمیل شد.")
+
+        def backup_files(thread_name):
+            with rlock:
+                logs.append(f"[{thread_name}] قفل RLock برای بک‌آپ فایل‌ها دریافت شد.")
+                time.sleep(0.2)
+                logs.append(f"[{thread_name}] بک‌آپ فایل‌ها تکمیل شد.")
+
+        def full_system_backup(thread_name):
+            with rlock:
+                logs.append(
+                    f"[{thread_name}] --- شروع بک‌آپ کامل سیستم (دریافت قفل اصلی) ---"
+                )
+                backup_db(thread_name)
+                backup_files(thread_name)
+                logs.append(f"[{thread_name}] --- بک‌آپ کامل سیستم به پایان رسید ---")
+
+        threads = [
+            threading.Thread(target=full_system_backup, args=("BackupAgent-1",)),
+            threading.Thread(target=backup_db, args=("IndependentDB-Backup",)),
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    else:
+        logs.append("شناسه سناریو نامعتبر است.")
+
+    return {"description": desc, "output": logs}
+
+
 def run_semaphore_thread(scenario_id: int):
     output_log = []
     description = ""

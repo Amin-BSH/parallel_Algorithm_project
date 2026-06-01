@@ -6,6 +6,7 @@ from backend.threads_scenarios import (
     run_semaphore_thread,
     run_determining_current_thread,
     run_thread_subclass,
+    run_rlock_thread,
 )
 
 app = FastAPI(title="Parallel Processing Project API")
@@ -23,17 +24,20 @@ def execute_scenario(request: ScenarioRequest):
         if request.tool == "basic_thread":
             result = run_basic_thread(request.scenario_id)
             return result
-        elif request.tool == "lock":
-            result = run_lock_thread(request.scenario_id)
-            return result
-        elif request.tool == "semaphore":
-            result = run_semaphore_thread(request.scenario_id)
-            return result
         elif request.tool == "determining_current_thread":
             result = run_determining_current_thread(request.scenario_id)
             return result
         elif request.tool == "subclass":
             result = run_thread_subclass(request.scenario_id)
+            return result
+        elif request.tool == "lock":
+            result = run_lock_thread(request.scenario_id)
+            return result
+        elif request.tool == "rlock":
+            result = run_rlock_thread(request.scenario_id)
+            return result
+        elif request.tool == "semaphore":
+            result = run_semaphore_thread(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Thread یافت نشد.")
