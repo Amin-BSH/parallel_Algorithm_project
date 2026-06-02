@@ -64,7 +64,15 @@ with col2:
     tool_display = (
         st.selectbox(
             "🛠️ ابزار همزمانی:",
-            ["نخ پایه", "مشخص کردن نخ فعلی", "زیر کلاس", "لاک", "آر لاک", "سمافور"],
+            [
+                "نخ پایه",
+                "مشخص کردن نخ فعلی",
+                "زیر کلاس",
+                "لاک",
+                "آر لاک",
+                "سمافور",
+                "شرط",
+            ],
         )
         if method_display == "نخ (Thread)"
         else st.selectbox("test", ["process"])
@@ -76,6 +84,7 @@ with col2:
         "لاک": "lock",
         "آر لاک": "rlock",
         "سمافور": "semaphore",
+        "شرط": "condition",
     }
 
 with col3:

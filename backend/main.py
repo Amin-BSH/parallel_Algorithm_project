@@ -2,11 +2,12 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from backend.threads_scenarios import (
     run_basic_thread,
-    run_lock_thread,
-    run_semaphore_thread,
     run_determining_current_thread,
     run_thread_subclass,
+    run_lock_thread,
     run_rlock_thread,
+    run_semaphore_thread,
+    run_condition_thread,
 )
 
 app = FastAPI(title="Parallel Processing Project API")
@@ -38,6 +39,9 @@ def execute_scenario(request: ScenarioRequest):
             return result
         elif request.tool == "semaphore":
             result = run_semaphore_thread(request.scenario_id)
+            return result
+        elif request.tool == "condition":
+            result = run_condition_thread(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Thread یافت نشد.")

@@ -539,3 +539,125 @@ def run_semaphore_thread(scenario_id: int):
         description = "شماره سناریو نامعتبر است."
 
     return {"output": output_log, "description": description}
+
+
+def run_condition_thread(scenario_id: int):
+    logs = []
+    desc = (
+        SCENARIO_DESCRIPTIONS.get("thread", {})
+        .get("condition", {})
+        .get(scenario_id, "توضیحات یافت نشد.")
+    )
+
+    if scenario_id == 1:
+        condition = threading.Condition()
+        buffer = []
+
+        def producer():
+            with condition:
+                logs.append("[تولیدکننده] در حال تولید داده...")
+                time.sleep(0.2)
+                buffer.append("بسته داده ۱")
+                logs.append(f"[تولیدکننده] داده به بافر اضافه شد. وضعیت بافر: {buffer}")
+                condition.notify()
+                logs.append("[تولیدکننده] سیگنال بیدارباش (notify) ارسال شد.")
+
+        def consumer():
+            with condition:
+                logs.append("[مصرف‌کننده] در حال بررسی بافر...")
+                while not buffer:
+                    logs.append("[مصرف‌کننده] بافر خالی است. در حال انتظار (wait)...")
+                    condition.wait()
+                item = buffer.pop(0)
+                logs.append(f"[مصرف‌کننده] داده '{item}' مصرف شد. وضعیت بافر: {buffer}")
+
+        t1 = threading.Thread(target=consumer)
+        t2 = threading.Thread(target=producer)
+
+        t1.start()
+        time.sleep(0.1)
+        t2.start()
+
+        t1.join()
+        t2.join()
+
+    elif scenario_id == 2:
+        condition = threading.Condition()
+        shared_state = {"temperature": 0}
+
+        def sensor_reader():
+            for _ in range(3):
+                time.sleep(0.2)
+                with condition:
+                    shared_state["temperature"] += 40
+                    logs.append(
+                        f"[سنسور] دما به {shared_state['temperature']} درجه رسید."
+                    )
+                    if shared_state["temperature"] >= 100:
+                        logs.append(
+                            "[سنسور] دما به حد بحرانی رسید! ارسال سیگنال به همه (notify_all)..."
+                        )
+                        condition.notify_all()
+                        break
+
+        def cooler_system(cooler_id):
+            with condition:
+                logs.append(
+                    f"[خنک‌کننده {cooler_id}] آماده به کار. در انتظار رسیدن دما به بالای ۱۰۰..."
+                )
+                while shared_state["temperature"] < 100:
+                    condition.wait()
+                logs.append(
+                    f"[خنک‌کننده {cooler_id}] سیگنال دریافت شد! شروع فرآیند خنک‌سازی..."
+                )
+
+        threads = [
+            threading.Thread(target=cooler_system, args=(1,)),
+            threading.Thread(target=cooler_system, args=(2,)),
+            threading.Thread(target=sensor_reader),
+        ]
+
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        condition = threading.Condition()
+        turn = {"current": "A"}
+
+        def worker_A():
+            for i in range(2):
+                with condition:
+                    while turn["current"] != "A":
+                        condition.wait()
+                    logs.append(f"[نخ A] مرحله {i + 1} را انجام داد.")
+                    time.sleep(0.1)
+                    turn["current"] = "B"
+                    logs.append("[نخ A] نوبت را به B داد و سیگنال فرستاد.")
+                    condition.notify()
+
+        def worker_B():
+            for i in range(2):
+                with condition:
+                    while turn["current"] != "B":
+                        condition.wait()
+                    logs.append(f"[نخ B] مرحله {i + 1} را انجام داد.")
+                    time.sleep(0.1)
+                    turn["current"] = "A"
+                    logs.append("[نخ B] نوبت را به A داد و سیگنال فرستاد.")
+                    condition.notify()
+
+        ta = threading.Thread(target=worker_A)
+        tb = threading.Thread(target=worker_B)
+
+        ta.start()
+        tb.start()
+        ta.join()
+        tb.join()
+        logs.append("[نخ اصلی] کار نوبتی هر دو نخ به پایان رسید.")
+
+    else:
+        logs.append("شناسه سناریو نامعتبر است.")
+
+    return {"description": desc, "output": logs}
