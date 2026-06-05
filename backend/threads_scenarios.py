@@ -661,3 +661,90 @@ def run_condition_thread(scenario_id: int):
         logs.append("شناسه سناریو نامعتبر است.")
 
     return {"description": desc, "output": logs}
+
+
+def run_event_thread(scenario_id):
+    logs = []
+
+    if scenario_id == 1:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("event", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+        start_event = threading.Event()
+
+        def worker():
+            logs.append("کارگر: در انتظار دریافت سیگنال شروع از مدیر...")
+            start_event.wait()
+            logs.append("کارگر: سیگنال دریافت شد. پردازش آغاز گردید.")
+
+        t = threading.Thread(target=worker)
+        t.start()
+
+        time.sleep(0.5)
+        logs.append("مدیر: تنظیمات اولیه انجام شد، ارسال سیگنال شروع...")
+        start_event.set()
+        start_event.clear()
+        t.join()
+
+    elif scenario_id == 2:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("event", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+        green_light_event = threading.Event()
+
+        def vehicle(car_id):
+            logs.append(f"خودرو {car_id}: رسیدن به تقاطع، منتظر سبز شدن چراغ...")
+            green_light_event.wait()
+            logs.append(f"خودرو {car_id}: چراغ سبز شد، عبور از تقاطع.")
+
+        threads = []
+        for i in range(1, 4):
+            t = threading.Thread(target=vehicle, args=(i,))
+            threads.append(t)
+            t.start()
+
+        logs.append("سیستم کنترل ترافیک: چراغ در حال حاضر قرمز است.")
+        time.sleep(0.5)
+
+        logs.append("سیستم کنترل ترافیک: چراغ سبز شد! (فراخوانی set)")
+        green_light_event.set()
+        green_light_event.clear()
+
+        for t in threads:
+            t.join()
+
+    elif scenario_id == 3:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("event", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+        work_done_event = threading.Event()
+
+        def background_task():
+            logs.append("تسک پس‌زمینه: در حال دانلود فایل حجیم...")
+            time.sleep(0.8)
+            logs.append("تسک پس‌زمینه: دانلود تمام شد.")
+            work_done_event.set()
+
+        t = threading.Thread(target=background_task)
+        t.start()
+
+        logs.append("نخ اصلی: شروع بررسی وضعیت تسک...")
+
+        while not work_done_event.is_set():
+            logs.append("نخ اصلی: فایل هنوز آماده نیست، در حال انجام کارهای دیگر...")
+            time.sleep(0.3)
+
+        logs.append("نخ اصلی: متوجه اتمام کار شدم. ادامه پردازش اصلی.")
+        t.join()
+
+    else:
+        desc = "سناریوی نامعتبر برای Event."
+        logs.append("خطا: شناسه سناریو یافت نشد.")
+
+    return {"description": desc, "output": logs}

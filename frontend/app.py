@@ -72,6 +72,7 @@ with col2:
                 "آر لاک",
                 "سمافور",
                 "شرط",
+                "رویداد",
             ],
         )
         if method_display == "نخ (Thread)"
@@ -85,6 +86,7 @@ with col2:
         "آر لاک": "rlock",
         "سمافور": "semaphore",
         "شرط": "condition",
+        "رویداد": "event",
     }
 
 with col3:
