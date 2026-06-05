@@ -65,28 +65,28 @@ with col2:
         st.selectbox(
             "🛠️ ابزار همزمانی:",
             [
-                "نخ پایه",
-                "مشخص کردن نخ فعلی",
-                "زیر کلاس",
-                "لاک",
-                "آر لاک",
-                "سمافور",
-                "شرط",
-                "رویداد",
+                "Basic Thread",
+                "Determining Current Thread",
+                "Subclass",
+                "Lock",
+                "RLock",
+                "Semaphore",
+                "Condition",
+                "Event",
             ],
         )
         if method_display == "نخ (Thread)"
         else st.selectbox("test", ["process"])
     )
     tool_map = {
-        "نخ پایه": "basic_thread",
-        "مشخص کردن نخ فعلی": "determining_current_thread",
-        "زیر کلاس": "subclass",
-        "لاک": "lock",
-        "آر لاک": "rlock",
-        "سمافور": "semaphore",
-        "شرط": "condition",
-        "رویداد": "event",
+        "Basic Thread": "basic_thread",
+        "Determining Current Thread": "determining_current_thread",
+        "Subclass": "subclass",
+        "Lock": "lock",
+        "RLock": "rlock",
+        "Semaphore": "semaphore",
+        "Condition": "condition",
+        "Event": "event",
     }
 
 with col3:
