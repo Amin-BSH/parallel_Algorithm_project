@@ -663,7 +663,7 @@ def run_condition_thread(scenario_id: int):
     return {"description": desc, "output": logs}
 
 
-def run_event_thread(scenario_id):
+def run_event_thread(scenario_id: int):
     logs = []
 
     if scenario_id == 1:
@@ -747,4 +747,98 @@ def run_event_thread(scenario_id):
         desc = "سناریوی نامعتبر برای Event."
         logs.append("خطا: شناسه سناریو یافت نشد.")
 
+    return {"description": desc, "output": logs}
+
+
+def run_barrier_thread(scenario_id: int):
+    logs = []
+    if scenario_id == 1:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("barrier", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+        num_runners = 3
+        race_barrier = threading.Barrier(
+            num_runners, action=lambda: logs.append("🏁 تقنگ شلیک شد! مسابقه شروع شد!")
+        )
+
+        def runner(name):
+            time.sleep(random.uniform(0.5, 1.5))
+            logs.append(f"🏃‍♂️ دونده {name} به خط شروع رسید و منتظر است...")
+            race_barrier.wait()
+            logs.append(f"💨 دونده {name} شروع به دویدن کرد!")
+
+        threads1 = [
+            threading.Thread(target=runner, args=(f"شماره {i + 1}",))
+            for i in range(num_runners)
+        ]
+        for t in threads1:
+            t.start()
+        for t in threads1:
+            t.join()
+
+    elif scenario_id == 2:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("barrier", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+        workers_count = 2
+        phase_barrier = threading.Barrier(
+            workers_count,
+            action=lambda: logs.append(
+                "🔄 مرحله تکمیل شد، در حال انتقال به مرحله بعدی..."
+            ),
+        )
+
+        def processor(worker_id):
+            logs.append(f"کارگر {worker_id}: در حال انجام فاز ۱...")
+            time.sleep(random.uniform(0.5, 1.0))
+            phase_barrier.wait()
+
+            logs.append(f"کارگر {worker_id}: در حال انجام فاز ۲...")
+            time.sleep(random.uniform(0.5, 1.0))
+            phase_barrier.wait()
+
+            logs.append(f"کارگر {worker_id}: کار تمام شد.")
+
+        threads2 = [
+            threading.Thread(target=processor, args=(i + 1,))
+            for i in range(workers_count)
+        ]
+        for t in threads2:
+            t.start()
+        for t in threads2:
+            t.join()
+
+    elif scenario_id == 3:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("barrier", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+
+        services = ["پایگاه داده", "سرویس کش", "وب‌سرور"]
+
+        startup_barrier = threading.Barrier(len(services) + 1)
+
+        def start_service(service_name):
+            logs.append(f"⏳ در حال راه‌اندازی {service_name}...")
+            time.sleep(random.uniform(0.5, 2.0))
+            logs.append(f"✅ {service_name} با موفقیت راه‌اندازی شد.")
+            startup_barrier.wait()
+
+        threads3 = [
+            threading.Thread(target=start_service, args=(svc,)) for svc in services
+        ]
+        for t in threads3:
+            t.start()
+
+        logs.append("مدیر سرور: منتظر آماده شدن تمام سرویس‌ها...")
+        startup_barrier.wait()
+        logs.append("🚀 تمام سرویس‌ها آنلاین شدند. سرور آماده پذیرش درخواست‌ها است!")
+
+        for t in threads3:
+            t.join()
     return {"description": desc, "output": logs}

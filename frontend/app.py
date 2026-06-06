@@ -73,6 +73,7 @@ with col2:
                 "Semaphore",
                 "Condition",
                 "Event",
+                "Barrier",
             ],
         )
         if method_display == "نخ (Thread)"
@@ -87,6 +88,7 @@ with col2:
         "Semaphore": "semaphore",
         "Condition": "condition",
         "Event": "event",
+        "Barrier": "barrier",
     }
 
 with col3:
