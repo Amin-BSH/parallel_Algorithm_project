@@ -844,7 +844,7 @@ def run_barrier_thread(scenario_id: int):
             t.join()
 
     else:
-        desc = "سناریوی نامعتبر برای Event."
+        desc = "سناریوی نامعتبر برای Barrier."
         logs.append("خطا: شناسه سناریو یافت نشد.")
 
     return {"description": desc, "output": logs}
@@ -952,7 +952,7 @@ def run_queue_thread(scenario_id):
         doc_thread.start()
         doc_thread.join()
     else:
-        desc = "سناریوی نامعتبر برای Event."
+        desc = "سناریوی نامعتبر برای Queue."
         logs.append("خطا: شناسه سناریو یافت نشد.")
 
     return {"description": desc, "output": logs}
