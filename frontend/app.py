@@ -74,6 +74,7 @@ with col2:
                 "Condition",
                 "Event",
                 "Barrier",
+                "Queue",
             ],
         )
         if method_display == "نخ (Thread)"
@@ -89,6 +90,7 @@ with col2:
         "Condition": "condition",
         "Event": "event",
         "Barrier": "barrier",
+        "Queue": "queue",
     }
 
 with col3:

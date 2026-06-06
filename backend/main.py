@@ -10,6 +10,7 @@ from backend.threads_scenarios import (
     run_condition_thread,
     run_event_thread,
     run_barrier_thread,
+    run_queue_thread,
 )
 
 app = FastAPI(title="Parallel Processing Project API")
@@ -50,6 +51,9 @@ def execute_scenario(request: ScenarioRequest):
             return result
         elif request.tool == "barrier":
             result = run_barrier_thread(request.scenario_id)
+            return result
+        elif request.tool == "queue":
+            result = run_queue_thread(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Thread یافت نشد.")
