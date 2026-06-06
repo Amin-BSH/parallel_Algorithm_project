@@ -1,4 +1,5 @@
 import os
+import queue
 import random
 import threading
 import time
@@ -841,4 +842,112 @@ def run_barrier_thread(scenario_id: int):
 
         for t in threads3:
             t.join()
+    return {"description": desc, "output": logs}
+
+
+def run_queue_thread(scenario_id):
+
+    logs = []
+
+    if scenario_id == 1:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("queue", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+
+        order_queue = queue.Queue(maxsize=5)
+
+        def producer():
+            for i in range(1, 6):
+                item = f"سفارش-{i}"
+                logs.append(f"📦 مشتری {item} را ثبت کرد.")
+                order_queue.put(item)
+                time.sleep(random.uniform(0.1, 0.5))
+
+        def consumer():
+            for _ in range(5):
+                item = order_queue.get()
+                logs.append(f"🛠️ در حال پردازش {item}...")
+                time.sleep(random.uniform(0.3, 0.8))
+                logs.append(f"✅ پردازش {item} تمام شد.")
+                order_queue.task_done()
+
+        t_prod = threading.Thread(target=producer)
+        t_cons = threading.Thread(target=consumer)
+
+        t_prod.start()
+        t_cons.start()
+
+        t_prod.join()
+        order_queue.join()
+
+    elif scenario_id == 2:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("queue", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+
+        task_queue = queue.Queue()
+
+        def worker(worker_id):
+            while True:
+                task = task_queue.get()
+                if task is None:
+                    break
+                logs.append(f"کارگر {worker_id}: در حال دانلود فایل '{task}'")
+                time.sleep(random.uniform(0.2, 0.6))
+                task_queue.task_done()
+
+        workers = []
+        for i in range(3):
+            t = threading.Thread(target=worker, args=(i + 1,))
+            t.start()
+            workers.append(t)
+
+        for i in range(1, 8):
+            task_queue.put(f"file_{i}.zip")
+
+        task_queue.join()
+
+        for _ in range(3):
+            task_queue.put(None)
+        for t in workers:
+            t.join()
+
+    elif scenario_id == 3:
+        desc = (
+            SCENARIO_DESCRIPTIONS.get("thread", {})
+            .get("queue", {})
+            .get(scenario_id, "توضیحات یافت نشد.")
+        )
+
+        pq = queue.PriorityQueue()
+
+        patients = [
+            (1, "بیمار با حمله قلبی"),
+            (2, "بیمار با شکستگی دست"),
+            (3, "بیمار با سردرد"),
+            (4, "بیمار برای چکاپ"),
+        ]
+        random.shuffle(patients)
+        for p in patients:
+            pq.put(p)
+            logs.append(f"پذیرش: {p[1]} (سطح اولویت: {p[0]})")
+
+        def doctor():
+            while not pq.empty():
+                priority, patient = pq.get()
+                logs.append(f"👨‍⚕️ پزشک در حال ویزیت: {patient} (اولویت: {priority})")
+                time.sleep(0.5)
+                pq.task_done()
+
+        doc_thread = threading.Thread(target=doctor)
+        doc_thread.start()
+        doc_thread.join()
+    else:
+        desc = "سناریوی نامعتبر برای Event."
+        logs.append("خطا: شناسه سناریو یافت نشد.")
+
     return {"description": desc, "output": logs}
