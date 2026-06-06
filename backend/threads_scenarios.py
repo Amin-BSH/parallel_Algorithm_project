@@ -850,7 +850,7 @@ def run_barrier_thread(scenario_id: int):
     return {"description": desc, "output": logs}
 
 
-def run_queue_thread(scenario_id):
+def run_queue_thread(scenario_id: int):
 
     logs = []
 
