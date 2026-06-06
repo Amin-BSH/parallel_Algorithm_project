@@ -841,4 +841,9 @@ def run_barrier_thread(scenario_id: int):
 
         for t in threads3:
             t.join()
+
+    else:
+        desc = "سناریوی نامعتبر برای Event."
+        logs.append("خطا: شناسه سناریو یافت نشد.")
+
     return {"description": desc, "output": logs}
