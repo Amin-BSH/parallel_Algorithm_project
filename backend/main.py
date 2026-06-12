@@ -13,7 +13,7 @@ from backend.threads_scenarios import (
     run_queue_thread,
 )
 
-from backend.process_scenarios import run_spawning_process
+from backend.ProcessScenarios.spawning_a_process import run_spawning_process
 
 app = FastAPI(title="Parallel Processing Project API")
 
