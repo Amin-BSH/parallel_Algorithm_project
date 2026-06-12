@@ -1,20 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
-from backend.ProcessScenarios.naming_a_process import run_naming_process
-from backend.ProcessScenarios.spawning_a_process import run_spawning_process
 from backend.threads_scenarios import (
-    run_barrier_thread,
     run_basic_thread,
-    run_condition_thread,
     run_determining_current_thread,
-    run_event_thread,
+    run_thread_subclass,
     run_lock_thread,
-    run_queue_thread,
     run_rlock_thread,
     run_semaphore_thread,
-    run_thread_subclass,
+    run_condition_thread,
+    run_event_thread,
+    run_barrier_thread,
+    run_queue_thread,
 )
+
+from backend.ProcessScenarios.spawning_a_process import run_spawning_process
 
 app = FastAPI(title="Parallel Processing Project API")
 
@@ -64,9 +63,6 @@ def execute_scenario(request: ScenarioRequest):
     elif request.method == "process":
         if request.tool == "spawning_a_process":
             result = run_spawning_process(request.scenario_id)
-            return result
-        elif request.tool == "naming_a_process":
-            result = run_naming_process(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Process یافت نشد.")

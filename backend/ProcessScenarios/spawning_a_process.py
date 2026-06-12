@@ -1,7 +1,6 @@
 import multiprocessing
-import os
 import time
-
+import os
 from backend.descriptions import SCENARIO_DESCRIPTIONS
 
 
