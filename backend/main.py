@@ -15,6 +15,7 @@ from backend.threads_scenarios import (
 
 from backend.ProcessScenarios.spawning_a_process import run_spawning_process
 from backend.ProcessScenarios.naming_a_process import run_naming_process
+from backend.ProcessScenarios.background_process import run_background_process
 
 app = FastAPI(title="Parallel Processing Project API")
 
@@ -67,6 +68,9 @@ def execute_scenario(request: ScenarioRequest):
             return result
         elif request.tool == "naming_a_process":
             result = run_naming_process(request.scenario_id)
+            return result
+        elif request.tool == "running_a_process_in_background":
+            result = run_background_process(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Process یافت نشد.")

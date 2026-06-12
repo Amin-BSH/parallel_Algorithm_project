@@ -79,7 +79,12 @@ with col2:
         )
         if method_display == "نخ (Thread)"
         else st.selectbox(
-            "🛠️ ابزار همزمانی:", ["Spawning a Process", "Naming a Process"]
+            "🛠️ ابزار همزمانی:",
+            [
+                "Spawning a Process",
+                "Naming a Process",
+                "Running a Process in Background",
+            ],
         )
     )
     tool_map = {
@@ -95,6 +100,7 @@ with col2:
         "Queue": "queue",
         "Spawning a Process": "spawning_a_process",
         "Naming a Process": "naming_a_process",
+        "Running a Process in Background": "running_a_process_in_background",
     }
 
 with col3:
