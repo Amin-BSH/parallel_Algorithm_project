@@ -78,7 +78,7 @@ with col2:
             ],
         )
         if method_display == "نخ (Thread)"
-        else st.selectbox("🛠️ ابزار همزمانی:", ["Spawning a Process"])
+        else st.selectbox("test", ["process"])
     )
     tool_map = {
         "Basic Thread": "basic_thread",
@@ -91,7 +91,6 @@ with col2:
         "Event": "event",
         "Barrier": "barrier",
         "Queue": "queue",
-        "Spawning a Process": "spawning_a_process",
     }
 
 with col3:

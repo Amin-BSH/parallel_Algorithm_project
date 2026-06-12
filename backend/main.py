@@ -61,10 +61,6 @@ def execute_scenario(request: ScenarioRequest):
             raise HTTPException(status_code=404, detail="ابزار Thread یافت نشد.")
 
     elif request.method == "process":
-        if request.tool == "spawning_a_process":
-            result = run_spawning_process(request.scenario_id)
-            return result
-        else:
-            raise HTTPException(status_code=404, detail="ابزار Process یافت نشد.")
+        pass
 
     raise HTTPException(status_code=400, detail="متد انتخابی نامعتبر است.")
