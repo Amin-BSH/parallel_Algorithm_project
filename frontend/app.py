@@ -85,6 +85,7 @@ with col2:
                 "Naming a Process",
                 "Running a Process in Background",
                 "Killing a Process",
+                "Subclassing a Process",
             ],
         )
     )
@@ -103,6 +104,7 @@ with col2:
         "Naming a Process": "naming_a_process",
         "Running a Process in Background": "running_a_process_in_background",
         "Killing a Process": "killing_a_process",
+        "Subclassing a Process": "subclassing_process",
     }
 
 with col3:
