@@ -84,6 +84,7 @@ with col2:
                 "Spawning a Process",
                 "Naming a Process",
                 "Running a Process in Background",
+                "Killing a Process",
             ],
         )
     )
@@ -101,6 +102,7 @@ with col2:
         "Spawning a Process": "spawning_a_process",
         "Naming a Process": "naming_a_process",
         "Running a Process in Background": "running_a_process_in_background",
+        "Killing a Process": "killing_a_process",
     }
 
 with col3:
