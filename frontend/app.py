@@ -88,6 +88,7 @@ with col2:
                 "Subclassing a Process",
                 "Queue",
                 "Synchronizing Processes",
+                "Using a Process Pool",
             ],
         )
     )
@@ -107,8 +108,9 @@ with col2:
         "Running a Process in Background": "running_a_process_in_background",
         "Killing a Process": "killing_a_process",
         "Subclassing a Process": "subclassing_process",
-        "Queue": "queue",
+        "Queue": "queue",  # noqa: F601
         "Synchronizing Processes": "synchronizing_processes",
+        "Using a Process Pool": "using_a_process_pool",
     }
 
 with col3:

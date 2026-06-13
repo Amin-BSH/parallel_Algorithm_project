@@ -20,6 +20,7 @@ from backend.ProcessScenarios.killing_a_process import run_killing_process
 from backend.ProcessScenarios.subclassing_process import run_subclassing_process
 from backend.ProcessScenarios.queue import run_using_a_queue
 from backend.ProcessScenarios.synchronizing_processes import run_synchronizing_processes
+from backend.ProcessScenarios.process_pool import run_using_a_process_pool
 
 
 app = FastAPI(title="Parallel Processing Project API")
@@ -88,6 +89,9 @@ def execute_scenario(request: ScenarioRequest):
             return result
         elif request.tool == "synchronizing_processes":
             result = run_synchronizing_processes(request.scenario_id)
+            return result
+        elif request.tool == "using_a_process_pool":
+            result = run_using_a_process_pool(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Process یافت نشد.")
