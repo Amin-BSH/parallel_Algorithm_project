@@ -87,6 +87,7 @@ with col2:
                 "Killing a Process",
                 "Subclassing a Process",
                 "Queue",
+                "Synchronizing Processes",
             ],
         )
     )
@@ -107,6 +108,7 @@ with col2:
         "Killing a Process": "killing_a_process",
         "Subclassing a Process": "subclassing_process",
         "Queue": "queue",
+        "Synchronizing Processes": "synchronizing_processes",
     }
 
 with col3:
