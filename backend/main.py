@@ -18,6 +18,8 @@ from backend.ProcessScenarios.naming_a_process import run_naming_process
 from backend.ProcessScenarios.background_process import run_background_process
 from backend.ProcessScenarios.killing_a_process import run_killing_process
 from backend.ProcessScenarios.subclassing_process import run_subclassing_process
+from backend.ProcessScenarios.queue import run_using_a_queue
+
 
 app = FastAPI(title="Parallel Processing Project API")
 
@@ -79,6 +81,9 @@ def execute_scenario(request: ScenarioRequest):
             return result
         elif request.tool == "subclassing_process":
             result = run_subclassing_process(request.scenario_id)
+            return result
+        elif request.tool == "queue":
+            result = run_using_a_queue(request.scenario_id)
             return result
         else:
             raise HTTPException(status_code=404, detail="ابزار Process یافت نشد.")

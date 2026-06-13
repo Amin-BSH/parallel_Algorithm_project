@@ -86,6 +86,7 @@ with col2:
                 "Running a Process in Background",
                 "Killing a Process",
                 "Subclassing a Process",
+                "Queue",
             ],
         )
     )
@@ -105,6 +106,7 @@ with col2:
         "Running a Process in Background": "running_a_process_in_background",
         "Killing a Process": "killing_a_process",
         "Subclassing a Process": "subclassing_process",
+        "Queue": "queue",
     }
 
 with col3:
