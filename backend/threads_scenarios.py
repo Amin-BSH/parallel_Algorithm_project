@@ -480,7 +480,7 @@ def run_semaphore_thread(scenario_id: int):
             output_log.append(f"🚗 ماشین {car_id} منتظر ورود به پارکینگ است...")
             semaphore.acquire()
             output_log.append(f"✅ ماشین {car_id} وارد پارکینگ شد.")
-            time.sleep(0.2)  # The waiting time in parking
+            time.sleep(0.2)
             output_log.append(f"⬅️ ماشین {car_id} از پارکینگ خارج شد.")
             semaphore.release()
 

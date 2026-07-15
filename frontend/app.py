@@ -1,7 +1,9 @@
-import streamlit as st
-import requests
 import base64
+import os
 from pathlib import Path
+
+import requests
+import streamlit as st
 
 
 def load_font():
@@ -47,7 +49,6 @@ def load_font():
 
 load_font()
 
-# تنظیمات صفحه
 st.set_page_config(
     page_title="Parallel Processing Project", page_icon="🚀", layout="centered"
 )
@@ -57,7 +58,8 @@ st.markdown("---")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    method_display = st.selectbox("⚙️ روش همزمانی:", ["نخ (Thread)", "فرآیند (Process)"])
+    method_display = st.selectbox(
+        "⚙️ روش همزمانی:", ["نخ (Thread)", "فرآیند (Process)"])
     method_map = {"نخ (Thread)": "thread", "فرآیند (Process)": "process"}
 
 with col2:
@@ -123,9 +125,11 @@ if st.button("▶️ اجرای سناریو", type="primary"):
             "tool": tool_map[tool_display],
             "scenario_id": scenario_id,
         }
+        BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
         try:
-            response = requests.post("http://localhost:8000/run-scenario", json=payload)
+            response = requests.post(
+                f"{BACKEND_URL}/run-scenario", json=payload)
 
             if response.status_code == 200:
                 data = response.json()

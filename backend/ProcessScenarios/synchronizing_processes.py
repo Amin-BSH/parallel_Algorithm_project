@@ -6,9 +6,11 @@ from backend.descriptions import SCENARIO_DESCRIPTIONS
 
 def task_with_lock(lock, process_num, shared_logs):
     with lock:
-        shared_logs.append(f"🔒 [Lock] my_func called by process N°{process_num}")
+        shared_logs.append(
+            f"🔒 [Lock] my_func called by process N°{process_num}")
         time.sleep(0.1)
-        shared_logs.append(f"🔓 [Lock] process N°{process_num} finished its task.")
+        shared_logs.append(
+            f"🔓 [Lock] process N°{process_num} finished its task.")
 
 
 def task_with_semaphore(sema, process_num, shared_logs):
@@ -26,13 +28,10 @@ def task_with_barrier(barrier, process_num, shared_logs):
     shared_logs.append(
         f"⏳ [Barrier] Process N°{process_num} is waiting at the barrier..."
     )
-    try:
-        barrier.wait()
-        shared_logs.append(f"🚀 [Barrier] Process N°{process_num} passed the barrier!")
-    except multiprocessing.BrokenBarrierError:
-        shared_logs.append(
-            f"❌ [Barrier] Process N°{process_num} failed due to broken barrier."
-        )
+
+    barrier.wait()
+    shared_logs.append(
+        f"🚀 [Barrier] Process N°{process_num} passed the barrier!")
 
 
 def run_synchronizing_processes(scenario_id):
@@ -51,7 +50,8 @@ def run_synchronizing_processes(scenario_id):
         processes = []
 
         for i in range(3):
-            p = multiprocessing.Process(target=task_with_lock, args=(lock, i, logs))
+            p = multiprocessing.Process(
+                target=task_with_lock, args=(lock, i, logs))
             processes.append(p)
             p.start()
 

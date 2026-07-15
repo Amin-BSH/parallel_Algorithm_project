@@ -102,6 +102,18 @@ curl -X POST http://localhost:8000/run-scenario \
   -d '{"method":"thread","tool":"basic_thread","scenario_id":1}'
 ```
 
+## Environment variables
+
+The project supports configuring a few runtime values via environment variables. Create a `.env` file in the project root or export variables in your environment. A sample file is provided at [.env.example](.env.example).
+
+- **BACKEND_URL**: URL the frontend should use to contact the backend (default: `http://localhost:8000`).
+
+To use the example file, copy it to `.env` and edit values as needed:
+
+```bash
+cp .env.example .env
+```
+
 ## Docker support
 
 A `Dockerfile` is included to run both the backend and frontend together in one container.
