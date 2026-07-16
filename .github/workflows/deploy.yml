@@ -18,10 +18,22 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
+      - name: Verify required secrets
+        run: |
+          test -n "${{ secrets.SERVER_HOST }}"
+          test -n "${{ secrets.SERVER_PORT }}"
+          test -n "${{ secrets.SERVER_USER }}"
+
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p "${{ secrets.SERVER_PORT }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          ssh-keyscan -T 20 -p "${{ secrets.SERVER_PORT }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p "${{ secrets.SERVER_PORT }}" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" "echo connected"
 
       - name: Deploy on server
         run: |
@@ -32,3 +44,4 @@ jobs:
             docker compose up -d --build
             docker image prune -f
           EOF
+
