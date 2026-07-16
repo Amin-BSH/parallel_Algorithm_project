@@ -23,7 +23,7 @@ from backend.ProcessScenarios.synchronizing_processes import run_synchronizing_p
 from backend.ProcessScenarios.process_pool import run_using_a_process_pool
 
 
-app = FastAPI(title="Parallel Processing Project API")
+app = FastAPI(title="Parallel Processing Project API", root_path="/api")
 
 
 class ScenarioRequest(BaseModel):
