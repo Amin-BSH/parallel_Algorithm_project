@@ -67,7 +67,7 @@ with col2:
         st.selectbox(
             "🛠️ ابزار همزمانی:",
             [
-                
+                "Basic Thread",
                 "Determining Current Thread",
                 "Subclass",
                 "Lock",
