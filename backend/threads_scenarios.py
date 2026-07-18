@@ -905,14 +905,16 @@ def run_queue_thread(scenario_id: int):
                 time.sleep(random.uniform(0.2, 0.6))
                 task_queue.task_done()
 
+        for i in range(1, 8):
+            task_queue.put(f"file_{i}.zip")
+
+
         workers = []
         for i in range(3):
             t = threading.Thread(target=worker, args=(i + 1,))
             t.start()
             workers.append(t)
 
-        for i in range(1, 8):
-            task_queue.put(f"file_{i}.zip")
 
         task_queue.join()
 
